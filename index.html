@@ -153,6 +153,45 @@
     .period-name small{display:block;color:var(--muted);font-size:10px;font-weight:650;margin-top:2px}
     .form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;flex-wrap:wrap}
 
+
+    .voice-box{
+      display:flex;align-items:center;justify-content:space-between;gap:14px;
+      margin:0 0 18px;padding:14px;border:1px solid var(--line);
+      border-radius:17px;background:var(--surface-2);
+    }
+    .voice-copy{min-width:0}
+    .voice-title{font-size:12px;font-weight:800;letter-spacing:-.15px}
+    .voice-subtitle{margin-top:4px;color:var(--muted);font-size:10px;line-height:1.5}
+    .voice-controls{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+    .mic-btn{
+      width:44px;height:44px;padding:0;border-radius:14px;display:grid;place-items:center;
+      font-size:17px;background:var(--text);color:var(--bg);border:0;box-shadow:none;
+    }
+    .mic-btn.listening{
+      animation:micPulse 1.15s ease-in-out infinite;
+      background:var(--accent);color:white;
+    }
+    .voice-status{
+      margin:0 0 16px;padding:10px 12px;border-radius:13px;background:var(--surface-3);
+      color:var(--muted);font-size:10px;line-height:1.5;display:none;
+    }
+    .voice-status.show{display:block}
+    .voice-status.success{
+      background:var(--green-soft);color:var(--green);
+    }
+    .voice-status.error{
+      background:var(--red-soft);color:var(--red);
+    }
+    .voice-transcript{font-weight:750;color:var(--text)}
+    @keyframes micPulse{
+      0%,100%{box-shadow:0 0 0 0 var(--accent-ring)}
+      50%{box-shadow:0 0 0 8px var(--accent-ring)}
+    }
+    @media(max-width:650px){
+      .voice-box{align-items:flex-start}
+      .voice-controls{align-self:center}
+      .voice-label{display:none}
+    }
     .smart-note{
       display:flex;align-items:flex-start;gap:10px;margin:-4px 0 18px;padding:12px 14px;
       border:1px solid #ddd9ff;background:#f7f5ff;border-radius:15px;color:#5d5874;
@@ -223,6 +262,40 @@
     .privacy{
       margin-top:18px;border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.6);
       padding:13px 15px;color:var(--muted);font-size:10px;line-height:1.6;
+    }
+
+    .utility-grid{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;
+    }
+    .utility-card{
+      border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:14px;
+    }
+    .utility-card h4{margin:0;font-size:12px;font-weight:800}
+    .utility-card p{margin:5px 0 12px;color:var(--muted);font-size:10px;line-height:1.5}
+    .utility-actions{display:flex;gap:7px;flex-wrap:wrap}
+    .save-indicator{
+      display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:10px;font-weight:700;
+      padding:7px 9px;border:1px solid var(--line);border-radius:999px;background:var(--surface);
+    }
+    .save-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+    .roster-controls{
+      display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;
+    }
+    .roster-list{display:grid;gap:8px}
+    .roster-row{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:12px 13px;
+    }
+    .roster-row strong{font-size:12px}
+    .roster-row span{font-size:10px;color:var(--muted)}
+    .file-input{display:none}
+    .mini-kpi{
+      display:flex;align-items:center;gap:8px;font-size:10px;color:var(--muted);margin-top:8px;
+    }
+    .mini-kpi b{color:var(--text)}
+    @media(max-width:850px){
+      .utility-grid{grid-template-columns:1fr}
+      .roster-controls{grid-template-columns:1fr}
     }
 
     .modal-backdrop{
@@ -537,6 +610,9 @@
         </div>
       </div>
       <div class="top-actions">
+        <div id="saveIndicator" class="save-indicator" title="Schedules are stored in this browser">
+          <span class="save-dot"></span><span id="saveText">Saved</span>
+        </div>
         <button id="themeToggle" class="btn btn-secondary btn-small theme-toggle" type="button" aria-label="Switch color theme">
           <span id="themeIcon" class="theme-icon" aria-hidden="true">☾</span>
           <span id="themeLabel" class="theme-label">Dark mode</span>
@@ -565,6 +641,8 @@
       <button class="tab" type="button" data-tab="add" aria-selected="false">+ Add schedule</button>
       <button class="tab" type="button" data-tab="matches" aria-selected="false">Find classmates</button>
       <button class="tab" type="button" data-tab="compare" aria-selected="false">Compare</button>
+      <button class="tab" type="button" data-tab="roster" aria-selected="false">Class roster</button>
+      <button class="tab" type="button" data-tab="tools" aria-selected="false">Tools</button>
     </nav>
 
     <section id="panel-students" class="panel active">
@@ -588,6 +666,19 @@
             <p>For each period, enter the class type and teacher, like <b>Science — Levi</b>.</p>
           </div>
         </div>
+
+        <div class="voice-box">
+          <div class="voice-copy">
+            <div class="voice-title">Add a class with your voice</div>
+            <div class="voice-subtitle">Try: “I got ELA sixth period with Denton” or “Period 2 science with Becker.”</div>
+          </div>
+          <div class="voice-controls">
+            <button id="voiceBtn" class="btn mic-btn" type="button" aria-label="Add class with voice" title="Add class with voice">🎙</button>
+            <span class="voice-label" style="font-size:11px;font-weight:750;color:var(--muted)">Speak</span>
+          </div>
+        </div>
+
+        <div id="voiceStatus" class="voice-status" aria-live="polite"></div>
 
         <div class="smart-note">
           <div class="smart-dot">✦</div>
@@ -647,7 +738,84 @@
       </div>
     </section>
 
-    <div class="privacy">Schedules are saved only in this browser using local storage. For a real school group, use first names, initials, or nicknames and avoid storing extra personal information you do not need.</div>
+
+    <section id="panel-roster" class="panel">
+      <div class="card">
+        <div class="section-head">
+          <div>
+            <h3>Class roster finder</h3>
+            <p>Pick a period, class, and teacher to see everyone in that exact class.</p>
+          </div>
+        </div>
+
+        <div class="roster-controls">
+          <div class="field">
+            <label for="rosterPeriod">PERIOD</label>
+            <select id="rosterPeriod">
+              <option value="0">Advisory</option>
+              <option value="1">Period 1</option>
+              <option value="2">Period 2</option>
+              <option value="3">Period 3</option>
+              <option value="4">Period 4</option>
+              <option value="5">Period 5</option>
+              <option value="6">Period 6</option>
+              <option value="7">Period 7</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="rosterClass">CLASS</label>
+            <select id="rosterClass"><option value="">Choose a class</option></select>
+          </div>
+          <div class="field">
+            <label for="rosterTeacher">TEACHER</label>
+            <select id="rosterTeacher"><option value="">Choose a teacher</option></select>
+          </div>
+        </div>
+
+        <div id="rosterResults"></div>
+      </div>
+    </section>
+
+    <section id="panel-tools" class="panel">
+      <div class="card">
+        <div class="section-head">
+          <div>
+            <h3>Data & backup tools</h3>
+            <p>Your schedules are kept under one permanent storage key so future ClassMatch updates can reuse them.</p>
+          </div>
+        </div>
+
+        <div class="utility-grid">
+          <div class="utility-card">
+            <h4>Export backup</h4>
+            <p>Download all schedules as a JSON backup file you can keep or move to another browser.</p>
+            <div class="utility-actions">
+              <button id="exportBtn" class="btn btn-secondary btn-small" type="button">Export data</button>
+            </div>
+          </div>
+
+          <div class="utility-card">
+            <h4>Import backup</h4>
+            <p>Restore a ClassMatch backup. You can merge it with existing students or replace everything.</p>
+            <div class="utility-actions">
+              <button id="importBtn" class="btn btn-secondary btn-small" type="button">Import data</button>
+              <input id="importFile" class="file-input" type="file" accept="application/json,.json" />
+            </div>
+          </div>
+
+          <div class="utility-card">
+            <h4>Local backup</h4>
+            <p>ClassMatch automatically keeps a small previous copy before important changes.</p>
+            <div class="utility-actions">
+              <button id="restoreBackupBtn" class="btn btn-secondary btn-small" type="button">Restore last backup</button>
+            </div>
+            <div id="backupInfo" class="mini-kpi"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="privacy">Schedules are saved in this browser under a stable ClassMatch storage key and older ClassMatch storage versions are migrated automatically. For a real school group, use first names, initials, or nicknames and avoid storing extra personal information you do not need.</div>
   </main>
 
   <div id="editBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="editTitle">
@@ -702,7 +870,9 @@
   (() => {
     "use strict";
 
-    const STORAGE_KEY = "classmatch_v3";
+    const STORAGE_KEY = "classmatch_data";
+    const BACKUP_KEY = "classmatch_backup";
+    const LEGACY_KEYS = ["classmatch_v3", "classmatch_v2", "classmatch_students"];
 
     const periods = [
       { number: 0, name: "Advisory", hint: "Period 0" },
@@ -774,6 +944,8 @@
     let students = loadStudents();
     let editingId = null;
     let toastTimer = null;
+    let recognition = null;
+    let isListening = false;
 
     const $ = (id) => document.getElementById(id);
 
@@ -810,13 +982,57 @@
       setTheme(currentTheme() === "dark" ? "light" : "dark");
     }
 
+    function parseStoredStudents(rawText) {
+      if (!rawText) return [];
+      const parsed = JSON.parse(rawText);
+
+      // New backup/export object format.
+      if (parsed && !Array.isArray(parsed) && Array.isArray(parsed.students)) {
+        return parsed.students.filter(Boolean).map(normalizeStudentShape);
+      }
+
+      // Current and older array format.
+      if (Array.isArray(parsed)) {
+        return parsed.filter(Boolean).map((student) => {
+          // Very old version stored eight plain class strings.
+          if (Array.isArray(student?.schedule) && typeof student.schedule[0] === "string") {
+            const schedule = Array.from({ length: 8 }, (_, i) => {
+              const oldText = clean(student.schedule[i] || "");
+              if (!oldText) return { className: "", teacher: "" };
+
+              // Best-effort split for old "Science - Levi" entries.
+              const split = oldText.split(/\s+[—–-]\s+/);
+              return split.length >= 2
+                ? { className: normalizeClassName(split[0]), teacher: normalizeTeacherName(split.slice(1).join(" ")) }
+                : { className: normalizeClassName(oldText), teacher: "" };
+            });
+            return { id: student.id || makeId(), name: clean(student.name || "Student"), schedule };
+          }
+          return normalizeStudentShape(student);
+        });
+      }
+
+      return [];
+    }
+
     function loadStudents() {
       try {
-        const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-        return Array.isArray(raw) ? raw.filter(Boolean).map(normalizeStudentShape) : [];
-      } catch {
-        return [];
+        const current = localStorage.getItem(STORAGE_KEY);
+        if (current) return parseStoredStudents(current);
+
+        // Migrate from any older ClassMatch storage key once.
+        for (const key of LEGACY_KEYS) {
+          const legacy = localStorage.getItem(key);
+          if (!legacy) continue;
+
+          const migrated = parseStoredStudents(legacy);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+          return migrated;
+        }
+      } catch (error) {
+        console.warn("ClassMatch could not read saved data:", error);
       }
+      return [];
     }
 
     function normalizeStudentShape(student) {
@@ -975,9 +1191,36 @@
       toastTimer = setTimeout(() => el.classList.remove("show"), 2200);
     }
 
-    function persist() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
+    function createLocalBackup() {
+      try {
+        const existing = localStorage.getItem(STORAGE_KEY);
+        if (!existing) return;
+        localStorage.setItem(BACKUP_KEY, JSON.stringify({
+          savedAt: new Date().toISOString(),
+          students: parseStoredStudents(existing)
+        }));
+      } catch (error) {
+        console.warn("ClassMatch backup failed:", error);
+      }
+    }
+
+    function persist({ backup = true } = {}) {
+      try {
+        if (backup) createLocalBackup();
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
+        const saveText = $("saveText");
+        if (saveText) {
+          saveText.textContent = "Saved";
+          window.setTimeout(() => {
+            saveText.textContent = "Saved";
+          }, 900);
+        }
+      } catch (error) {
+        console.error("ClassMatch save failed:", error);
+        showToast("Couldn't save in this browser.");
+      }
       renderAll();
+      renderBackupInfo();
     }
 
     function scheduleBuilderHTML(prefix, schedule = null) {
@@ -1053,6 +1296,246 @@
       const teacherB = norm(B.teacher);
 
       return classA !== "" && teacherA !== "" && classA === classB && teacherA === teacherB;
+    }
+
+
+    function numberWordToPeriod(word) {
+      const key = comparisonKey(word);
+      const lookup = {
+        "0": 0, "zero": 0, "zeroth": 0, "advisory": 0,
+        "1": 1, "1st": 1, "one": 1, "first": 1,
+        "2": 2, "2nd": 2, "two": 2, "second": 2,
+        "3": 3, "3rd": 3, "three": 3, "third": 3,
+        "4": 4, "4th": 4, "four": 4, "fourth": 4,
+        "5": 5, "5th": 5, "five": 5, "fifth": 5,
+        "6": 6, "6th": 6, "six": 6, "sixth": 6,
+        "7": 7, "7th": 7, "seven": 7, "seventh": 7
+      };
+      return Object.prototype.hasOwnProperty.call(lookup, key) ? lookup[key] : null;
+    }
+
+    function detectPeriodFromSpeech(transcript) {
+      const lower = transcript.toLowerCase();
+
+      if (/\badvisory\b/.test(lower)) return 0;
+
+      const patterns = [
+        /\b(?:period\s*)?(0|1|2|3|4|5|6|7)(?:st|nd|rd|th)?\s*(?:period)?\b/i,
+        /\b(first|second|third|fourth|fifth|sixth|seventh|zeroth)\s+period\b/i,
+        /\bperiod\s+(one|two|three|four|five|six|seven|zero|first|second|third|fourth|fifth|sixth|seventh)\b/i
+      ];
+
+      for (const pattern of patterns) {
+        const match = lower.match(pattern);
+        if (match) {
+          const period = numberWordToPeriod(match[1]);
+          if (period !== null) return period;
+        }
+      }
+
+      return null;
+    }
+
+    function stripPeriodLanguage(transcript) {
+      return clean(
+        transcript
+          .replace(/\b(?:my\s+)?(?:0|1|2|3|4|5|6|7)(?:st|nd|rd|th)?\s+period\b/gi, " ")
+          .replace(/\bperiod\s+(?:0|1|2|3|4|5|6|7)(?:st|nd|rd|th)?\b/gi, " ")
+          .replace(/\b(?:first|second|third|fourth|fifth|sixth|seventh|zeroth)\s+period\b/gi, " ")
+          .replace(/\bperiod\s+(?:one|two|three|four|five|six|seven|zero|first|second|third|fourth|fifth|sixth|seventh)\b/gi, " ")
+          .replace(/\badvisory\b/gi, " ")
+          .replace(/\b(?:i\s+got|i\s+have|ive\s+got|i've\s+got|my|class\s+is|is)\b/gi, " ")
+      );
+    }
+
+    function classFromSpeech(text) {
+      const lower = comparisonKey(text);
+
+      // Prefer exact alias phrases found anywhere in the utterance.
+      const aliasKeys = Object.keys(CLASS_ALIASES).sort((a, b) => b.length - a.length);
+      for (const alias of aliasKeys) {
+        const safe = alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        if (new RegExp(`(?:^|\\s)${safe}(?:$|\\s)`, "i").test(lower)) {
+          return CLASS_ALIASES[alias];
+        }
+      }
+
+      // Then look for a close preset among short word groups.
+      const words = lower.split(" ").filter(Boolean);
+      for (let size = Math.min(3, words.length); size >= 1; size--) {
+        for (let i = 0; i <= words.length - size; i++) {
+          const phrase = words.slice(i, i + size).join(" ");
+          const close = closestPreset(phrase, CLASS_PRESETS, 3);
+          if (close) return close;
+        }
+      }
+
+      return "";
+    }
+
+    function parseVoiceClass(transcript) {
+      const period = detectPeriodFromSpeech(transcript);
+      if (period === null) {
+        return { ok: false, message: "I heard you, but I couldn't tell which period you meant." };
+      }
+
+      const raw = clean(transcript);
+      const withMatch = raw.match(/\bwith\b\s+(.+)$/i);
+
+      let teacher = "";
+      if (withMatch) {
+        teacher = normalizeTeacherName(withMatch[1]);
+      }
+
+      let classSearchText = withMatch ? raw.slice(0, withMatch.index) : raw;
+      classSearchText = stripPeriodLanguage(classSearchText);
+      const className = period === 0 && !classFromSpeech(classSearchText)
+        ? "Advisory"
+        : classFromSpeech(classSearchText);
+
+      // Support "teacher Denton" / "Denton is my teacher" if "with" wasn't used.
+      if (!teacher) {
+        const teacherMatch = raw.match(/\bteacher(?:\s+is)?\s+(.+)$/i);
+        if (teacherMatch) teacher = normalizeTeacherName(teacherMatch[1]);
+      }
+
+      if (!className) {
+        return { ok: false, message: "I found the period, but couldn't recognize the class type." };
+      }
+
+      if (!teacher) {
+        return { ok: false, message: `I got ${className} for ${period === 0 ? "Advisory" : `Period ${period}`}, but I couldn't tell the teacher. Try saying “with Denton.”` };
+      }
+
+      return { ok: true, period, className, teacher };
+    }
+
+    function setVoiceStatus(message, type = "") {
+      const status = $("voiceStatus");
+      if (!status) return;
+      status.className = `voice-status show ${type}`.trim();
+      status.innerHTML = message;
+    }
+
+    function clearVoiceStatusSoon() {
+      window.setTimeout(() => {
+        const status = $("voiceStatus");
+        if (status) status.classList.remove("show");
+      }, 6000);
+    }
+
+    function applyVoiceResult(result, transcript) {
+      if (!result.ok) {
+        setVoiceStatus(
+          `<span class="voice-transcript">“${escapeHTML(transcript)}”</span><br>${escapeHTML(result.message)}`,
+          "error"
+        );
+        return;
+      }
+
+      const classInput = $(`addClass${result.period}`);
+      const teacherInput = $(`addTeacher${result.period}`);
+
+      classInput.value = normalizeClassName(result.className);
+      teacherInput.value = normalizeTeacherName(result.teacher);
+
+      // Briefly focus the filled row so the user can immediately see/edit it.
+      classInput.focus();
+      classInput.blur();
+
+      setVoiceStatus(
+        `<span class="voice-transcript">“${escapeHTML(transcript)}”</span><br>Added <b>${escapeHTML(classInput.value)} — ${escapeHTML(teacherInput.value)}</b> to <b>${result.period === 0 ? "Advisory" : `Period ${result.period}`}</b>.`,
+        "success"
+      );
+      clearVoiceStatusSoon();
+    }
+
+    function updateVoiceButton() {
+      const button = $("voiceBtn");
+      if (!button) return;
+      button.classList.toggle("listening", isListening);
+      button.textContent = isListening ? "■" : "🎙";
+      button.setAttribute("aria-label", isListening ? "Stop listening" : "Add class with voice");
+      button.setAttribute("title", isListening ? "Stop listening" : "Add class with voice");
+    }
+
+    function stopVoiceRecognition() {
+      if (recognition && isListening) {
+        try { recognition.stop(); } catch {}
+      }
+    }
+
+    function startVoiceRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (!SpeechRecognition) {
+        setVoiceStatus(
+          "Voice entry isn't supported by this browser. Try the current version of Chrome or Edge, or type the class normally.",
+          "error"
+        );
+        return;
+      }
+
+      if (isListening) {
+        stopVoiceRecognition();
+        return;
+      }
+
+      recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+      recognition.continuous = false;
+      recognition.maxAlternatives = 3;
+
+      recognition.onstart = () => {
+        isListening = true;
+        updateVoiceButton();
+        setVoiceStatus("Listening… Say something like <b>“I got ELA sixth period with Denton.”</b>");
+      };
+
+      recognition.onresult = (event) => {
+        const alternatives = Array.from(event.results[0] || []);
+        const transcripts = alternatives.map((item) => item.transcript).filter(Boolean);
+
+        // Try each speech-recognition alternative; use the first one we can parse.
+        let chosenTranscript = transcripts[0] || "";
+        let parsed = parseVoiceClass(chosenTranscript);
+
+        for (const transcript of transcripts) {
+          const attempt = parseVoiceClass(transcript);
+          if (attempt.ok) {
+            chosenTranscript = transcript;
+            parsed = attempt;
+            break;
+          }
+        }
+
+        applyVoiceResult(parsed, chosenTranscript);
+      };
+
+      recognition.onerror = (event) => {
+        const messages = {
+          "not-allowed": "Microphone access was blocked. Allow microphone access for this page, then try again.",
+          "service-not-allowed": "Voice recognition is blocked in this browser.",
+          "no-speech": "I didn't hear anything. Tap the mic and try again.",
+          "audio-capture": "I couldn't access a microphone on this device.",
+          "network": "Voice recognition couldn't connect. Check your connection and try again."
+        };
+        setVoiceStatus(messages[event.error] || "Voice recognition didn't work that time. Try again.", "error");
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        updateVoiceButton();
+      };
+
+      try {
+        recognition.start();
+      } catch {
+        isListening = false;
+        updateVoiceButton();
+        setVoiceStatus("Voice recognition couldn't start. Try tapping the mic again.", "error");
+      }
     }
 
     function addStudent() {
@@ -1200,6 +1683,7 @@
                 </div>
               </div>
               <div class="row-actions">
+                <button class="btn btn-secondary btn-small" type="button" data-action="duplicate" data-id="${student.id}">Copy</button>
                 <button class="btn btn-secondary btn-small" type="button" data-action="edit" data-id="${student.id}">Edit</button>
                 <button class="btn btn-danger btn-small" type="button" data-action="delete" data-id="${student.id}">Delete</button>
               </div>
@@ -1208,6 +1692,223 @@
           </article>
         `;
       }).join("");
+    }
+
+
+    function duplicateStudent(id) {
+      const source = students.find((student) => student.id === id);
+      if (!source) return;
+
+      const baseName = `${source.name} Copy`;
+      let name = baseName;
+      let suffix = 2;
+      while (students.some((student) => norm(student.name) === norm(name))) {
+        name = `${baseName} ${suffix++}`;
+      }
+
+      students.push({
+        id: makeId(),
+        name,
+        schedule: source.schedule.map((item) => ({ ...item }))
+      });
+
+      persist();
+      openEdit(students[students.length - 1].id);
+      showToast("Schedule copied. Change the name and anything else you need.");
+    }
+
+    function rosterOptionsForPeriod(period) {
+      const classes = new Set();
+      const teachers = new Set();
+
+      students.forEach((student) => {
+        const item = student.schedule?.[period];
+        if (item?.className) classes.add(item.className);
+        if (item?.teacher) teachers.add(item.teacher);
+      });
+
+      return {
+        classes: [...classes].sort((a, b) => a.localeCompare(b)),
+        teachers: [...teachers].sort((a, b) => a.localeCompare(b))
+      };
+    }
+
+    function renderRosterFilters() {
+      const period = Number($("rosterPeriod").value || 0);
+      const { classes, teachers } = rosterOptionsForPeriod(period);
+
+      const classSelect = $("rosterClass");
+      const teacherSelect = $("rosterTeacher");
+      const oldClass = classSelect.value;
+      const oldTeacher = teacherSelect.value;
+
+      classSelect.innerHTML = `<option value="">Any class</option>` +
+        classes.map((value) => `<option value="${escapeHTML(value)}">${escapeHTML(value)}</option>`).join("");
+
+      teacherSelect.innerHTML = `<option value="">Any teacher</option>` +
+        teachers.map((value) => `<option value="${escapeHTML(value)}">${escapeHTML(value)}</option>`).join("");
+
+      if (classes.includes(oldClass)) classSelect.value = oldClass;
+      if (teachers.includes(oldTeacher)) teacherSelect.value = oldTeacher;
+    }
+
+    function renderRoster() {
+      const period = Number($("rosterPeriod").value || 0);
+      const className = $("rosterClass").value;
+      const teacher = $("rosterTeacher").value;
+
+      const matches = students
+        .filter((student) => {
+          const item = student.schedule?.[period];
+          if (!item?.className && !item?.teacher) return false;
+          if (className && norm(item.className) !== norm(className)) return false;
+          if (teacher && norm(item.teacher) !== norm(teacher)) return false;
+          return true;
+        })
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      const results = $("rosterResults");
+
+      if (!matches.length) {
+        results.innerHTML = `
+          <div class="empty">
+            <div class="empty-icon">◎</div>
+            <strong>No students found</strong>
+            Try a different class, teacher, or period.
+          </div>
+        `;
+        return;
+      }
+
+      results.innerHTML = `
+        <div class="mini-kpi"><b>${matches.length}</b> student${matches.length === 1 ? "" : "s"} found</div>
+        <div class="roster-list">
+          ${matches.map((student) => {
+            const item = student.schedule[period];
+            return `
+              <div class="roster-row">
+                <div>
+                  <strong>${escapeHTML(student.name)}</strong>
+                  <div><span>${escapeHTML(item.className || "Class")} — ${escapeHTML(item.teacher || "Teacher not entered")}</span></div>
+                </div>
+                <span>${period === 0 ? "Advisory" : `Period ${period}`}</span>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function exportData() {
+      const payload = {
+        app: "ClassMatch",
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        students
+      };
+
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `classmatch-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast("Backup exported.");
+    }
+
+    function importDataFile(file) {
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const imported = parseStoredStudents(String(reader.result || ""));
+          if (!imported.length) {
+            showToast("That backup doesn't contain any schedules.");
+            return;
+          }
+
+          const replace = confirm(
+            `Found ${imported.length} schedule${imported.length === 1 ? "" : "s"}. Press OK to replace current data, or Cancel to merge them.`
+          );
+
+          if (replace) {
+            students = imported;
+          } else {
+            const byName = new Map(students.map((student) => [norm(student.name), student]));
+            imported.forEach((student) => {
+              const existing = byName.get(norm(student.name));
+              if (!existing) {
+                students.push({ ...student, id: makeId() });
+              }
+            });
+          }
+
+          persist();
+          switchTab("students");
+          showToast("Backup imported.");
+        } catch (error) {
+          console.error(error);
+          showToast("That file isn't a valid ClassMatch backup.");
+        } finally {
+          $("importFile").value = "";
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function renderBackupInfo() {
+      const el = $("backupInfo");
+      if (!el) return;
+
+      try {
+        const raw = localStorage.getItem(BACKUP_KEY);
+        if (!raw) {
+          el.innerHTML = "No previous local backup yet.";
+          return;
+        }
+
+        const backup = JSON.parse(raw);
+        const count = Array.isArray(backup.students) ? backup.students.length : 0;
+        const date = backup.savedAt ? new Date(backup.savedAt) : null;
+        el.innerHTML = `<b>${count}</b> schedules · ${date && !Number.isNaN(date.valueOf()) ? date.toLocaleString() : "previous save"}`;
+      } catch {
+        el.innerHTML = "Backup information unavailable.";
+      }
+    }
+
+    function restoreLocalBackup() {
+      try {
+        const raw = localStorage.getItem(BACKUP_KEY);
+        if (!raw) {
+          showToast("There isn't a local backup yet.");
+          return;
+        }
+
+        const backup = JSON.parse(raw);
+        const restored = Array.isArray(backup.students)
+          ? backup.students.map(normalizeStudentShape)
+          : [];
+
+        if (!restored.length) {
+          showToast("The local backup is empty.");
+          return;
+        }
+
+        if (!confirm(`Restore the previous backup with ${restored.length} schedule${restored.length === 1 ? "" : "s"}?`)) return;
+
+        // Do not overwrite BACKUP_KEY before restore completes.
+        students = restored;
+        persist({ backup: false });
+        switchTab("students");
+        showToast("Previous backup restored.");
+      } catch (error) {
+        console.error(error);
+        showToast("Couldn't restore the local backup.");
+      }
     }
 
     function renderSelects() {
@@ -1349,6 +2050,9 @@
       updateStats();
       renderMatches();
       renderCompare();
+      renderRosterFilters();
+      renderRoster();
+      renderBackupInfo();
     }
 
     function loadDemo() {
@@ -1412,6 +2116,7 @@
       if (!confirm("Delete every saved schedule?")) return;
       students = [];
       localStorage.removeItem(STORAGE_KEY);
+      LEGACY_KEYS.forEach((key) => localStorage.removeItem(key));
       renderAll();
       showToast("All schedules cleared.");
     }
@@ -1423,6 +2128,7 @@
     $("addStudentBtn").addEventListener("click", addStudent);
     $("resetFormBtn").addEventListener("click", resetAddForm);
     $("themeToggle").addEventListener("click", toggleTheme);
+    $("voiceBtn").addEventListener("click", startVoiceRecognition);
     $("demoBtn").addEventListener("click", loadDemo);
     $("clearAllBtn").addEventListener("click", clearAll);
     $("searchInput").addEventListener("input", renderStudents);
@@ -1432,11 +2138,22 @@
     $("closeEditBtn").addEventListener("click", closeEdit);
     $("cancelEditBtn").addEventListener("click", closeEdit);
     $("saveEditBtn").addEventListener("click", saveEdit);
+    $("rosterPeriod").addEventListener("change", () => {
+      renderRosterFilters();
+      renderRoster();
+    });
+    $("rosterClass").addEventListener("change", renderRoster);
+    $("rosterTeacher").addEventListener("change", renderRoster);
+    $("exportBtn").addEventListener("click", exportData);
+    $("importBtn").addEventListener("click", () => $("importFile").click());
+    $("importFile").addEventListener("change", (event) => importDataFile(event.target.files?.[0]));
+    $("restoreBackupBtn").addEventListener("click", restoreLocalBackup);
 
     $("studentsGrid").addEventListener("click", (event) => {
       const button = event.target.closest("button[data-action]");
       if (!button) return;
       const { action, id } = button.dataset;
+      if (action === "duplicate") duplicateStudent(id);
       if (action === "edit") openEdit(id);
       if (action === "delete") deleteStudent(id);
     });
